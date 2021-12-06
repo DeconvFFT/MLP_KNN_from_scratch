@@ -120,7 +120,7 @@ class MultilayerPerceptron:
 
         np.random.seed(42)
 
-        raise NotImplementedError('This function must be implemented by the student.')
+        #raise NotImplementedError('This function must be implemented by the student.')
 
     def fit(self, X, y):
         """
@@ -136,8 +136,15 @@ class MultilayerPerceptron:
         """
 
         self._initialize(X, y)
+        w0, w1 = [],[]
+        losses = []
+        n_epochs = 600
+        # for epoch in range(n_epochs):
 
-        raise NotImplementedError('This function must be implemented by the student.')
+        #     if epoch % 20 == 0:
+
+
+        #raise NotImplementedError('This function must be implemented by the student.')
 
     def predict(self, X):
         """

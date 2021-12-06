@@ -65,8 +65,9 @@ class KNearestNeighbors:
         Returns:
             None.
         """
-
-        raise NotImplementedError('This function must be implemented by the student.')
+        self._X  = X
+        self._y = y        
+        #raise NotImplementedError('This function must be implemented by the student.')
 
     def predict(self, X):
         """
@@ -78,5 +79,32 @@ class KNearestNeighbors:
         Returns:
             A numpy array of shape (n_samples,) representing the predicted target class values for the given test data.
         """
+        preds = []
+        for i in range(len(X)):
+            distances = []
 
-        raise NotImplementedError('This function must be implemented by the student.')
+            for train_X in self._X:
+                if(self.weights == "distance"):
+                    distance = self._distance(train_X, X[i])
+                    if distance == 0.0:
+                        distances.append(0)
+                    else:
+                        distances.append(1/distance)
+                else:
+                    distances.append(self._distance(train_X, X[i]))
+                
+            idxs = []
+            if(self.weights == "distance"):
+                idxs = np.argsort(distances)[::-1][:self.n_neighbors]
+            else:
+                idxs = np.argsort(distances)[:self.n_neighbors]
+            #distances = distances
+            neighbours = self._y[idxs]
+            labels, counts = np.unique(neighbours, return_counts=True)
+            best_label = labels[np.argmax(counts)]
+
+            preds.append(best_label)
+        #print(f'best_label: {preds}')
+
+        return preds
+        #raise NotImplementedError('This function must be implemented by the student.')

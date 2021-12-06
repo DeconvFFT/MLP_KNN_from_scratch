@@ -5,8 +5,7 @@
 # Based on skeleton code by CSCI-B 551 Fall 2021 Course Staff
 
 import numpy as np
-
-
+from math import sqrt, exp
 def euclidean_distance(x1, x2):
     """
     Computes and returns the Euclidean distance between two vectors.
@@ -16,7 +15,8 @@ def euclidean_distance(x1, x2):
         x2: A numpy array of shape (n_features,).
     """
 
-    raise NotImplementedError('This function must be implemented by the student.')
+    return np.sqrt(np.sum((x1-x2)**2))
+    #raise NotImplementedError('This function must be implemented by the student.')
 
 
 def manhattan_distance(x1, x2):
@@ -27,8 +27,8 @@ def manhattan_distance(x1, x2):
         x1: A numpy array of shape (n_features,).
         x2: A numpy array of shape (n_features,).
     """
-
-    raise NotImplementedError('This function must be implemented by the student.')
+    return np.sum(abs(x1-x2))
+    #raise NotImplementedError('This function must be implemented by the student.')
 
 
 def identity(x, derivative = False):
@@ -40,8 +40,11 @@ def identity(x, derivative = False):
         x: A numpy array of shape (n_samples, n_hidden).
         derivative: A boolean representing whether or not the derivative of the function should be returned instead.
     """
-
-    raise NotImplementedError('This function must be implemented by the student.')
+    if derivative:
+        return 1
+    else:
+        return x
+    #raise NotImplementedError('This function must be implemented by the student.')
 
 
 def sigmoid(x, derivative = False):
@@ -53,8 +56,12 @@ def sigmoid(x, derivative = False):
         x: A numpy array of shape (n_samples, n_hidden).
         derivative: A boolean representing whether or not the derivative of the function should be returned instead.
     """
-
-    raise NotImplementedError('This function must be implemented by the student.')
+    f = 1/(1 + np.exp(-x))
+    if derivative:
+        return f*(1-f)
+    else:
+        return f 
+    #raise NotImplementedError('This function must be implemented by the student.')
 
 
 def tanh(x, derivative = False):
@@ -66,8 +73,12 @@ def tanh(x, derivative = False):
         x: A numpy array of shape (n_samples, n_hidden).
         derivative: A boolean representing whether or not the derivative of the function should be returned instead.
     """
-
-    raise NotImplementedError('This function must be implemented by the student.')
+    f = (np.exp(x)-np.exp(-x)) / (np.exp(x)+ np.exp(-x))
+    if derivative:
+        return 1 - f**2
+    else:
+        return f
+    #raise NotImplementedError('This function must be implemented by the student.')
 
 
 def relu(x, derivative = False):
@@ -79,8 +90,12 @@ def relu(x, derivative = False):
         x: A numpy array of shape (n_samples, n_hidden).
         derivative: A boolean representing whether or not the derivative of the function should be returned instead.
     """
-
-    raise NotImplementedError('This function must be implemented by the student.')
+    f = x*(x>0)
+    if derivative:
+        return 1.0 * (x >0)
+    else:
+        return f
+    #raise NotImplementedError('This function must be implemented by the student.')
 
 
 def softmax(x, derivative = False):
@@ -105,8 +120,10 @@ def cross_entropy(y, p):
             A numpy array of shape (n_samples, n_outputs) representing the predicted probabilities from the softmax
             output activation function.
     """
-
-    raise NotImplementedError('This function must be implemented by the student.')
+    N = y.shape[0]
+    ce = -np.sum(y*np.log(p) + (1 - y) * np.log(1-y)) / N
+    return ce
+    #raise NotImplementedError('This function must be implemented by the student.')
 
 
 def one_hot_encoding(y):
@@ -122,5 +139,7 @@ def one_hot_encoding(y):
         A numpy array of shape (n_samples, n_outputs) representing the one-hot encoded target class values for the input
         data. n_outputs is equal to the number of unique categorical class values in the numpy array y.
     """
-
-    raise NotImplementedError('This function must be implemented by the student.')
+    n_classes = len(np.unique(y))
+    labels = y.reshape(-1)
+    return np.eye(n_classes)[labels]
+    #raise NotImplementedError('This function must be implemented by the student.')
