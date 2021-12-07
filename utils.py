@@ -56,7 +56,6 @@ def sigmoid(x, derivative = False):
         x: A numpy array of shape (n_samples, n_hidden).
         derivative: A boolean representing whether or not the derivative of the function should be returned instead.
     """
-    x = np.clip(x, 0, 1e10)
     f = 1./(1. + np.exp(-x))
     if derivative:
         return f*(1-f)
@@ -76,7 +75,6 @@ def tanh(x, derivative = False):
     """
 
     # tanh function definition referred from here:  https://www.nbshare.io/notebook/751082217/Activation-Functions-In-Python/
-    x = np.clip(x, 0, 1e10)
 
     f = 2. / (1 + np.exp(-2*x)) - 1.
     if derivative:
@@ -133,7 +131,7 @@ def cross_entropy(y, p):
 
 def cross_entropy_derivative(y, p):
     p  = np.clip(p, 1e-15, 1 - 1e-15)
-    derivative = -(y/p) - ((1-y)/(1-p))
+    derivative = - (y / p) + (1 - y) / (1 - p)
     return derivative
 
 def normalize(X, axis=-1, order=2):

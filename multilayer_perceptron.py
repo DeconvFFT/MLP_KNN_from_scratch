@@ -115,12 +115,14 @@ class MultilayerPerceptron:
         # initialise hidden weights
         self._h_weights = np.random.uniform(-val, val, (n_features, self.n_hidden))
        
-        self._h_bias = np.zeros((1, self.n_hidden))
+        self._h_bias = np.ones((1, self.n_hidden))
+
+        val = 1.0/sqrt(n_features)
 
         # initialise output weights
         self._o_weights = np.random.uniform(-val, val, (self.n_hidden, n_outputs))
        
-        self._o_bias = np.zeros((1, n_outputs))
+        self._o_bias = np.ones((1, n_outputs))
         
     def relu_initialization(self):
         """
@@ -133,11 +135,11 @@ class MultilayerPerceptron:
 
         # Initialise hidden weights
         self._h_weights = np.random.randn((n_features, self.n_hidden))*std
-        self._h_bias = np.zeros((1, self.n_hidden))
+        self._h_bias = np.ones((1, self.n_hidden))
 
         # Initialise output weights
         self._o_weights = np.random.randn((self.n_hidden, n_outputs))*std
-        self._o_bias = np.zeros((1, n_outputs))
+        self._o_bias = np.ones((1, n_outputs))
 
         # # scale numbers as per guassian with mean = 0, std = sqrt(2/n)
         # scaled = nums * std
@@ -200,18 +202,19 @@ class MultilayerPerceptron:
             # Backward pass, update weights and biases
             
             # gradients for output layer's input
-            del_out_layer_inp = cross_entropy_derivative(self._y, y_pred) * self._output_activation(output_layer_input, derivative=True)
+            del_out_layer_inp = (y_pred-self._y) * self._output_activation(output_layer_input, derivative=True)
             del_out_w = hidden_output.T.dot(del_out_layer_inp)
             del_out_b = np.sum(del_out_layer_inp, axis = 0, keepdims=True)
 
+            self._o_weights -= self.learning_rate * del_out_w
+            self._o_bias -= self.learning_rate * del_out_b
             # gradients for hidden layer input
             del_hidden_layer_inp = del_out_layer_inp.dot(self._o_weights.T) * self.hidden_activation(hidden_input, derivative=True)
             del_hidden_w = X.T.dot(del_hidden_layer_inp)
             del_hidden_b = np.sum(del_hidden_layer_inp, axis = 0, keepdims=True)
             
 
-            self._o_weights -= self.learning_rate * del_out_w
-            self._o_bias -= self.learning_rate * del_out_b
+            
             self._h_weights -= self.learning_rate * del_hidden_w
             self._h_bias -= self.learning_rate * del_hidden_b
             # self.output_o = self._output_activation(np.dot(self.output_h, self._o_weights))+ self._o_bias.T
