@@ -162,7 +162,6 @@ def test_mlp():
                                         params['n_iterations'], params['learning_rate'])
         my_model.fit(X_train_i, y_train_i)
         y_pred = my_model.predict(X_test_i)
-
         mlp_iris_results.loc[len(mlp_iris_results)] = ['My Model',
                                                        params['n_hidden'],
                                                        params['hidden_activation'],

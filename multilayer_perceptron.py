@@ -5,8 +5,8 @@
 # Based on skeleton code by CSCI-B 551 Fall 2021 Course Staff
 
 import numpy as np
-from utils import identity, sigmoid, tanh, relu, softmax, cross_entropy, one_hot_encoding
-
+from utils import identity, sigmoid, tanh, relu, softmax, cross_entropy, one_hot_encoding, cross_entropy_derivative,normalize
+from math import sqrt
 
 class MultilayerPerceptron:
     """
@@ -102,6 +102,48 @@ class MultilayerPerceptron:
         self._o_weights = None
         self._o_bias = None
 
+    def xavier_initialization(self):
+        """
+        Function to initialise weights when we have a tanh or sigmoid activation function.
+        Used Xavier Initialization
+        """
+        n_features = self._X.shape[1]
+        n_outputs = self._y.shape[1]
+
+        val = 1.0/sqrt(n_features)
+        
+        # initialise hidden weights
+        self._h_weights = np.random.uniform(-val, val, (n_features, self.n_hidden))
+       
+        self._h_bias = np.zeros((1, self.n_hidden))
+
+        # initialise output weights
+        self._o_weights = np.random.uniform(-val, val, (self.n_hidden, n_outputs))
+       
+        self._o_bias = np.zeros((1, n_outputs))
+        
+    def relu_initialization(self):
+        """
+        Function to initialise weights when we have a relu activation function.
+        Used He Weight Initialization
+        """
+        n_features = self._X.shape[1]
+        n_outputs = self._y.shape[1]
+        std = sqrt(2.0 / n_features)
+
+        # Initialise hidden weights
+        self._h_weights = np.random.randn((n_features, self.n_hidden))*std
+        self._h_bias = np.zeros((1, self.n_hidden))
+
+        # Initialise output weights
+        self._o_weights = np.random.randn((self.n_hidden, n_outputs))*std
+        self._o_bias = np.zeros((1, n_outputs))
+
+        # # scale numbers as per guassian with mean = 0, std = sqrt(2/n)
+        # scaled = nums * std
+        # print(f'scaled: {scaled}')
+        # return scaled
+
     def _initialize(self, X, y):
         """
         Function called at the beginning of fit(X, y) that performs one hot encoding for the target class values and
@@ -117,10 +159,12 @@ class MultilayerPerceptron:
 
         self._X = X
         self._y = one_hot_encoding(y)
-
+        
         np.random.seed(42)
+        self.relu_initialization() if self.hidden_activation =="relu" else self.xavier_initialization()
 
         #raise NotImplementedError('This function must be implemented by the student.')
+
 
     def fit(self, X, y):
         """
@@ -136,13 +180,45 @@ class MultilayerPerceptron:
         """
 
         self._initialize(X, y)
-        w0, w1 = [],[]
-        losses = []
-        n_epochs = 600
-        # for epoch in range(n_epochs):
 
-        #     if epoch % 20 == 0:
 
+        for epoch in range(self.n_iterations):
+
+            # Forward pass computation 
+            # activation(Wx+b) for hidden
+            hidden_input = self._X.dot(self._h_weights)+ self._h_bias
+            hidden_output = self.hidden_activation(hidden_input)
+
+            # activation(Wx+b) for output layer
+            output_layer_input = hidden_output.dot(self._o_weights) + self._o_bias
+            y_pred = self._output_activation(output_layer_input)
+            celoss = self._loss_function(self._y, y_pred)
+
+            if epoch%20 == 0:
+                self._loss_history.append(celoss)
+
+            # Backward pass, update weights and biases
+            
+            # gradients for output layer's input
+            del_out_layer_inp = cross_entropy_derivative(self._y, y_pred) * self._output_activation(output_layer_input, derivative=True)
+            del_out_w = hidden_output.T.dot(del_out_layer_inp)
+            del_out_b = np.sum(del_out_layer_inp, axis = 0, keepdims=True)
+
+            # gradients for hidden layer input
+            del_hidden_layer_inp = del_out_layer_inp.dot(self._o_weights.T) * self.hidden_activation(hidden_input, derivative=True)
+            del_hidden_w = X.T.dot(del_hidden_layer_inp)
+            del_hidden_b = np.sum(del_hidden_layer_inp, axis = 0, keepdims=True)
+            
+
+            self._o_weights -= self.learning_rate * del_out_w
+            self._o_bias -= self.learning_rate * del_out_b
+            self._h_weights -= self.learning_rate * del_hidden_w
+            self._h_bias -= self.learning_rate * del_hidden_b
+            # self.output_o = self._output_activation(np.dot(self.output_h, self._o_weights))+ self._o_bias.T
+            # celoss = self._loss_function(self._y, self.output_o)
+            # print(f'celoss: {celoss}')
+            # if epoch % 20 == 0:
+            #     self._loss_history.append(celoss)
 
         #raise NotImplementedError('This function must be implemented by the student.')
 
@@ -156,5 +232,10 @@ class MultilayerPerceptron:
         Returns:
             A numpy array of shape (n_samples,) representing the predicted target class values for the given test data.
         """
-
-        raise NotImplementedError('This function must be implemented by the student.')
+        hidden_inp = X.dot(self._h_weights) + self._h_bias
+        hidden_output = self.hidden_activation(hidden_inp)
+        output_layer_input = hidden_output.dot(self._o_weights) + self._o_bias
+        y_pred = self._output_activation(output_layer_input)
+        y_pred = np.argmax(y_pred, axis =1)
+        return y_pred
+        #raise NotImplementedError('This function must be implemented by the student.')

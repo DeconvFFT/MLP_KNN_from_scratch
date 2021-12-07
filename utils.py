@@ -56,7 +56,8 @@ def sigmoid(x, derivative = False):
         x: A numpy array of shape (n_samples, n_hidden).
         derivative: A boolean representing whether or not the derivative of the function should be returned instead.
     """
-    f = 1/(1 + np.exp(-x))
+    x = np.clip(x, 0, 1e10)
+    f = 1./(1. + np.exp(-x))
     if derivative:
         return f*(1-f)
     else:
@@ -73,11 +74,16 @@ def tanh(x, derivative = False):
         x: A numpy array of shape (n_samples, n_hidden).
         derivative: A boolean representing whether or not the derivative of the function should be returned instead.
     """
-    f = (np.exp(x)-np.exp(-x)) / (np.exp(x)+ np.exp(-x))
+
+    # tanh function definition referred from here:  https://www.nbshare.io/notebook/751082217/Activation-Functions-In-Python/
+    x = np.clip(x, 0, 1e10)
+
+    f = 2. / (1 + np.exp(-2*x)) - 1.
     if derivative:
-        return 1 - f**2
+        return 1 - np.power(f,2)
     else:
         return f
+
     #raise NotImplementedError('This function must be implemented by the student.')
 
 
@@ -90,11 +96,11 @@ def relu(x, derivative = False):
         x: A numpy array of shape (n_samples, n_hidden).
         derivative: A boolean representing whether or not the derivative of the function should be returned instead.
     """
-    f = x*(x>0)
+    
     if derivative:
-        return 1.0 * (x >0)
+        return np.where(x >= 0, 1, 0)
     else:
-        return f
+        return  np.where(x >= 0, x, 0)
     #raise NotImplementedError('This function must be implemented by the student.')
 
 
@@ -120,11 +126,21 @@ def cross_entropy(y, p):
             A numpy array of shape (n_samples, n_outputs) representing the predicted probabilities from the softmax
             output activation function.
     """
-    N = y.shape[0]
-    ce = -np.sum(y*np.log(p) + (1 - y) * np.log(1-y)) / N
+    p = np.clip(p, 1e-15, 1 - 1e-15)
+    ce = -y * np.log(p) - (1 - y) * np.log(1-p)
     return ce
     #raise NotImplementedError('This function must be implemented by the student.')
 
+def cross_entropy_derivative(y, p):
+    p  = np.clip(p, 1e-15, 1 - 1e-15)
+    derivative = -(y/p) - ((1-y)/(1-p))
+    return derivative
+
+def normalize(X, axis=-1, order=2):
+    """ Normalize the dataset X """
+    l2 = np.atleast_1d(np.linalg.norm(X, order, axis))
+    l2[l2 == 0] = 1
+    return X / np.expand_dims(l2, axis)
 
 def one_hot_encoding(y):
     """
