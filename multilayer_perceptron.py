@@ -5,7 +5,7 @@
 # Based on skeleton code by CSCI-B 551 Fall 2021 Course Staff
 
 import numpy as np
-from utils import identity, sigmoid, tanh, relu, softmax, cross_entropy, one_hot_encoding, cross_entropy_derivative,normalize
+from utils import identity, sigmoid, tanh, relu, softmax, cross_entropy, one_hot_encoding
 from math import sqrt
 
 class MultilayerPerceptron:
@@ -189,11 +189,10 @@ class MultilayerPerceptron:
             # activation(Wx+b) for output layer
             output_layer_input = hidden_output.dot(self._o_weights) + self._o_bias
             y_pred = self._output_activation(output_layer_input)
-            celoss = self._loss_function(self._y, y_pred)
-
-            if epoch%20 == 0:
-                self._loss_history.append(celoss)
-
+            celoss = np.sum(self._loss_function(self._y, y_pred))
+            self._loss_history.append(celoss)
+            # if epoch%20 == 0:
+            #     print(f"CELOSS: {celoss}")
             # Backward pass, update weights and biases
             
             # gradients for output layer's input
@@ -206,7 +205,7 @@ class MultilayerPerceptron:
             
             # gradients for hidden layer input
             del_hidden_layer_inp = del_out_layer_inp.dot(self._o_weights.T) * self.hidden_activation(hidden_input, derivative=True)
-            del_hidden_w = X.T.dot(del_hidden_layer_inp)
+            del_hidden_w = self._X.T.dot(del_hidden_layer_inp)
             del_hidden_b = np.sum(del_hidden_layer_inp, axis = 0, keepdims=True)
             
 

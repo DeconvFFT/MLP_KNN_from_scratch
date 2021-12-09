@@ -1,6 +1,6 @@
 # utils.py: Utility file for implementing helpful utility functions used by the ML algorithms.
 #
-# Submitted by: [enter your full name here] -- [enter your IU username here]
+# Submitted by: [Saumya Hetalbhai Mehta] -- [mehtasau]
 #
 # Based on skeleton code by CSCI-B 551 Fall 2021 Course Staff
 
@@ -124,21 +124,11 @@ def cross_entropy(y, p):
             A numpy array of shape (n_samples, n_outputs) representing the predicted probabilities from the softmax
             output activation function.
     """
+    # cross entropy clipping logic to avoid divide by 0 error inspired from: https://www.python-engineer.com/courses/pytorchbeginner/11-softmax-and-crossentropy/
     p = np.clip(p, 1e-15, 1 - 1e-15)
     ce = -y * np.log(p) - (1 - y) * np.log(1-p)
     return ce
     #raise NotImplementedError('This function must be implemented by the student.')
-
-def cross_entropy_derivative(y, p):
-    p  = np.clip(p, 1e-15, 1 - 1e-15)
-    derivative = - (y / p) + (1 - y) / (1 - p)
-    return derivative
-
-def normalize(X, axis=-1, order=2):
-    """ Normalize the dataset X """
-    l2 = np.atleast_1d(np.linalg.norm(X, order, axis))
-    l2[l2 == 0] = 1
-    return X / np.expand_dims(l2, axis)
 
 def one_hot_encoding(y):
     """
