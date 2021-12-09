@@ -1,6 +1,6 @@
 # k_nearest_neighbors.py: Machine learning implementation of a K-Nearest Neighbors classifier from scratch.
 #
-# Submitted by: [enter your full name here] -- [enter your IU username here]
+# Submitted by: [Saumya Hetalbhai Mehta] -- [mehtasau]
 #
 # Based on skeleton code by CSCI-B 551 Fall 2021 Course Staff
 
@@ -98,13 +98,11 @@ class KNearestNeighbors:
                 idxs = np.argsort(distances)[::-1][:self.n_neighbors]
             else:
                 idxs = np.argsort(distances)[:self.n_neighbors]
-            #distances = distances
             neighbours = self._y[idxs]
             labels, counts = np.unique(neighbours, return_counts=True)
             best_label = labels[np.argmax(counts)]
 
             preds.append(best_label)
-        #print(f'best_label: {preds}')
 
         return preds
         #raise NotImplementedError('This function must be implemented by the student.')

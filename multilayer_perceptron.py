@@ -1,6 +1,6 @@
 # multilayer_perceptron.py: Machine learning implementation of a Multilayer Perceptron classifier from scratch.
 #
-# Submitted by: [enter your full name here] -- [enter your IU username here]
+# Submitted by: [Saumya Hetalbhai Mehta] -- [mehtasau]
 #
 # Based on skeleton code by CSCI-B 551 Fall 2021 Course Staff
 
@@ -141,11 +141,6 @@ class MultilayerPerceptron:
         self._o_weights = np.random.randn((self.n_hidden, n_outputs))*std
         self._o_bias = np.ones((1, n_outputs))
 
-        # # scale numbers as per guassian with mean = 0, std = sqrt(2/n)
-        # scaled = nums * std
-        # print(f'scaled: {scaled}')
-        # return scaled
-
     def _initialize(self, X, y):
         """
         Function called at the beginning of fit(X, y) that performs one hot encoding for the target class values and
@@ -208,6 +203,7 @@ class MultilayerPerceptron:
 
             self._o_weights -= self.learning_rate * del_out_w
             self._o_bias -= self.learning_rate * del_out_b
+            
             # gradients for hidden layer input
             del_hidden_layer_inp = del_out_layer_inp.dot(self._o_weights.T) * self.hidden_activation(hidden_input, derivative=True)
             del_hidden_w = X.T.dot(del_hidden_layer_inp)
@@ -217,13 +213,6 @@ class MultilayerPerceptron:
             
             self._h_weights -= self.learning_rate * del_hidden_w
             self._h_bias -= self.learning_rate * del_hidden_b
-            # self.output_o = self._output_activation(np.dot(self.output_h, self._o_weights))+ self._o_bias.T
-            # celoss = self._loss_function(self._y, self.output_o)
-            # print(f'celoss: {celoss}')
-            # if epoch % 20 == 0:
-            #     self._loss_history.append(celoss)
-
-        #raise NotImplementedError('This function must be implemented by the student.')
 
     def predict(self, X):
         """
