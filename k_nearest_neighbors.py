@@ -100,7 +100,19 @@ class KNearestNeighbors:
                 idxs = np.argsort(distances)[:self.n_neighbors]
             neighbours = self._y[idxs]
             labels, counts = np.unique(neighbours, return_counts=True)
-            best_label = labels[np.argmax(counts)]
+            best_label = 0
+            if(self.weights == "distance"):
+                dists = dict()
+            
+                for i in idxs:
+
+                    dists[self._y[i]] = 0
+                
+                for i in idxs:
+                    dists[self._y[i]]+= distances[i]
+                best_label = max(dists, key=dists.get)
+            else:
+                best_label = labels[np.argmax(counts)]
 
             preds.append(best_label)
 
